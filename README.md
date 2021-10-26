@@ -1,8 +1,8 @@
 # Bad-CPU-raymarcher
 A Bad CPU raymarcher written in C#
 
-![alt text](https://github.com/khhs/Bad-CPU-raymarcher/blob/master/Raytracer/images/single.png?raw=true)
-![alt text](https://github.com/khhs/Bad-CPU-raymarcher/blob/master/Raytracer/images/multi-debug.png?raw=true)
+![single sphere](https://github.com/Khhs167/Bad-CPU-raymarcher/raw/master/Raytracer/images/single.png)
+![multiple spheres + debug menu](https://github.com/Khhs167/Bad-CPU-raymarcher/raw/master/Raytracer/images/multi-debug.png)
 
 ## Contributing
 dont
