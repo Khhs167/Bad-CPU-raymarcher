@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 
-namespace Raytracer.Shaders
+namespace Raymarcher.Shaders
 {
     public class Basic : IShader
     {

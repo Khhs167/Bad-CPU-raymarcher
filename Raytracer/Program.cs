@@ -4,7 +4,7 @@ using System.Numerics;
 using System.Diagnostics;
 using System.Collections.Generic;
 
-namespace Raytracer
+namespace Raymarcher
 {
     class Program
     {
