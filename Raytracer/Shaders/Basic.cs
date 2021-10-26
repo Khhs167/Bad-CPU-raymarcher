@@ -18,22 +18,19 @@ namespace Raymarcher.Shaders
 
         public LightningType lightning = LightningType.Basic;
 
-        public float roughness = 1f;
+        public float roughness = 0.1f;
 
         public Color Fragment(FragmentInput args)
         {
-
-            if (args.layer >= 5)
-                return args.sphere.color;
 
             float light = CalculateLightning(args);
             //args.sphere.color
             Color c = args.sphere.color;
 
-            if (roughness < 1)
+            if (roughness < 1 && args.layer < 5)
                 c = LerpC(GetReflection(args), c, roughness);
 
-            c = MultC(c, light);
+            c = MultC(c, Math.Clamp(light / MathF.Min(roughness, 0.000001f), 0f, 1f));
             return c;
         }
 
