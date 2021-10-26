@@ -84,7 +84,7 @@ namespace Raymarcher
                         color = new Color(random.Next(256), random.Next(256),random.Next(256), 255),
                         radius = (float)random.NextDouble() * 0.5f,
                         shader = Shaders.Basic.shader,
-                        rnd = (float)random.NextDouble()
+                        rnd = (float)random.NextDouble() * 100f
                     });
                 }
 
@@ -96,7 +96,7 @@ namespace Raymarcher
 
                 foreach (var sphere in spheres)
                 {
-                    sphere.posistion.X = MathF.Sin((float)Raylib.GetTime()) + 3f;
+                    sphere.posistion.X = MathF.Sin((float)Raylib.GetTime() + sphere.rnd) + 3f;
                 }
                 
             }
