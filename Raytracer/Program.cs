@@ -64,7 +64,7 @@ namespace Raymarcher
                     Raylib.DrawText("REND: " + mspf + " ms", 5, 5, 10, Color.GREEN);
                     //Raylib.DrawText("HIGH: " + average, 5, 5, 10, Color.GREEN);
                     Raylib.DrawText("DRAW: " + mspd + " ms", 5, 15, 10, Color.GREEN);
-                    Raylib.DrawText("FPS : " + 1000 / (mspd + mspf), 5,25, 10, Color.GREEN);
+                    Raylib.DrawText("FPS : " + 1000f / (mspd + mspf), 5,25, 10, Color.GREEN);
 
                     Raylib.DrawText("RESL: " + width + "x" + height, 5, height - 25, 10, Color.GREEN);
                     Raylib.DrawText("OBJC: " + spheres.Count, 5, height - 15, 10, Color.GREEN);
