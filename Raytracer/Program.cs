@@ -165,7 +165,7 @@ namespace Raymarcher
                     float dst = spheres[o].DistanceToSurface(pos);
                     if (dst <= precision)
                     {
-                        return spheres[o].shader.Fragment(new FragmentInput { position = pos, ray = direction, sphere = spheres[o] });
+                        return spheres[o].shader.Fragment(new FragmentInput { position = pos, ray = direction, sphere = spheres[o], layer = 0 });
                     }
 
                     lowestDst = MathF.Min(lowestDst, dst);

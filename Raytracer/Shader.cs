@@ -16,5 +16,6 @@ namespace Raymarcher
         public Vector3 position;
         public Vector3 ray;
         public Sphere sphere;
+        public int layer;
     }
 }

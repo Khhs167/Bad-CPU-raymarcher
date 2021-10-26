@@ -16,14 +16,24 @@ namespace Raymarcher.Shaders
     {
         public static IShader shader = new Basic();
 
-        public LightningType lightning = LightningType.None;
+        public LightningType lightning = LightningType.Basic;
+
+        public float roughness = 1f;
 
         public Color Fragment(FragmentInput args)
         {
-            
-            float light = CalculateLightning(args);
 
-            Color c = MultC(args.sphere.color, light);
+            if (args.layer >= 5)
+                return args.sphere.color;
+
+            float light = CalculateLightning(args);
+            //args.sphere.color
+            Color c = args.sphere.color;
+
+            if (roughness < 1)
+                c = LerpC(GetReflection(args), c, roughness);
+
+            c = MultC(c, light);
             return c;
         }
 
@@ -34,16 +44,20 @@ namespace Raymarcher.Shaders
             if (lightning == LightningType.Basic)
                 return SimpleSun(b) / MathF.PI;
             else if (lightning == LightningType.Sun)
-                return Ray(args.position, args.ray, Program.sunStrength, args.sphere) / Program.sunStrength;
+                return SunRay(args.position, Program.sunStrength, args.sphere);
             else if (lightning == LightningType.None)
                 return 1;
 
             throw new Exception("No lightning alivalable for fragment shader!");
         }
 
-        public static float Ray(Vector3 origin, Vector3 direction, float maxLen, Sphere sphere)
+        public static float SunRay(Vector3 origin, float maxLen, Sphere sphere)
         {
-            float distanceTraveled = Program.precision + float.Epsilon;
+            float distanceTraveled = 0;
+
+            Vector3 direction = Vector3.Normalize(Program.sun);
+
+            //origin += sphere.CalculateNormal(origin) * Program.precision;
             while (distanceTraveled <= maxLen)
             {
                 Vector3 pos = origin + (direction * distanceTraveled);
@@ -55,7 +69,7 @@ namespace Raymarcher.Shaders
 
                     if (dst <= Program.precision)
                     {
-                        return maxLen;
+                        return 0;
                     }
 
                     lowestDst = MathF.Min(lowestDst, dst);
@@ -64,7 +78,41 @@ namespace Raymarcher.Shaders
                 distanceTraveled += lowestDst;
             }
 
-            return distanceTraveled;
+            return 1;
+        }
+
+        public static Color GetReflection(FragmentInput args)
+        {
+            float distanceTraveled = 0;
+
+            Vector3 direction = Vector3.Reflect(args.sphere.CalculateNormal(args.position), args.ray);
+
+            //origin += sphere.CalculateNormal(origin) * Program.precision;
+            while (distanceTraveled <= Program.farPlane)
+            {
+                Vector3 pos = args.position + (direction * distanceTraveled);
+                float lowestDst = float.MaxValue;
+
+                for (int o = 0; o < Program.spheres.Count; o++)
+                {
+
+                    if (Program.spheres[o] == args.sphere)
+                        continue;
+
+                    float dst = Program.spheres[o].DistanceToSurface(pos);
+
+                    if (dst <= Program.precision)
+                    {
+                        return Program.spheres[o].shader.Fragment(new FragmentInput { position = pos, ray = direction, sphere = Program.spheres[o], layer = args.layer + 1 });
+                    }
+
+                    lowestDst = MathF.Min(lowestDst, dst);
+                }
+
+                distanceTraveled += lowestDst;
+            }
+            
+            return Color.BLUE;
         }
 
         public static Color MultC(Color a, Color b)
@@ -74,6 +122,14 @@ namespace Raymarcher.Shaders
         public static Color MultC(Color a, float b)
         {
             return new Color((byte)(a.r * b), (byte)(a.g * b), (byte)(a.b * b), a.a);
+        }
+
+        public static Color LerpC(Color a, Color b, float x)
+        {
+            Vector4 av = new Vector4(a.r, a.g, a.b, a.a);
+            Vector4 bv = new Vector4(b.r, b.g, b.b, b.a);
+            Vector4 o = Vector4.Lerp(av, bv, x);
+            return new Color((int)o.X, (int)o.Y, (int)o.Z, (int)o.W);
         }
 
         public static float SimpleSun(Vector3 n)
