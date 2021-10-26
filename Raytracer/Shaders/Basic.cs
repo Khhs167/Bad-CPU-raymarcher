@@ -10,19 +10,52 @@ namespace Raymarcher.Shaders
     {
         public static IShader shader = new Basic();
 
+        // Change for a lightshow
+        public static bool basicSun = true;
 
         public Color Fragment(FragmentInput args)
         {
-            Vector3 b = Vector3.Reflect(args.sphere.CalculateNormal(args.position), args.ray);
-            float light = SimpleSun(b) / MathF.PI;
-            //return b.Y < 0.5f ? spheres[o].color : Color.BLACK;
+            
+            float light = CalculateLightning(args);
+
             Color c = MultC(args.sphere.color, light);
-            //c.a -= (byte)(precision / (precision - dst) * 255);
             return c;
-            //return new Color((byte)(light * 255), (byte)(light * 255), (byte)(light * 255), (byte)255);
-            //return new Color((byte)(b.X * 255), (byte)(b.Y * 255), (byte)(b.Z * 255), (byte)255);
         }
 
+        public float CalculateLightning(FragmentInput args)
+        {
+            Vector3 b = Vector3.Reflect(args.sphere.CalculateNormal(args.position), args.ray);
+
+            if(basicSun)
+                return SimpleSun(b) / MathF.PI;
+            else
+                return Ray(args.position, args.ray, Program.sunStrength, args.sphere) / Program.sunStrength;
+        }
+
+        public static float Ray(Vector3 origin, Vector3 direction, float maxLen, Sphere sphere)
+        {
+            float distanceTraveled = Program.precision + float.Epsilon;
+            while (distanceTraveled <= maxLen)
+            {
+                Vector3 pos = origin + (direction * distanceTraveled);
+                float lowestDst = float.MaxValue;
+
+                for (int o = 0; o < Program.spheres.Count; o++)
+                {
+                    float dst = Program.spheres[o].DistanceToSurface(pos);
+                    if (dst <= Program.precision)
+                    {
+                        return maxLen;
+                    }
+
+                    lowestDst = MathF.Min(lowestDst, dst);
+                }
+
+                distanceTraveled += lowestDst;
+            }
+
+            return distanceTraveled - 10;
+        }
 
         public static Color MultC(Color a, Color b)
         {
