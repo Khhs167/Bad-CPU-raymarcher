@@ -12,7 +12,7 @@ namespace Raymarcher
         public static float ratio = (float)height / width;
         public static float nearPlane = 1f, farPlane = 10f;
 
-        public static float precision = 1f;
+        public static float precision = 0.001f;
         public static float sunStrength = 20f;
 
         public static float average = 0f;

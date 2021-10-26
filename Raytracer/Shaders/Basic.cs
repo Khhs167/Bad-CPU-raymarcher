@@ -6,12 +6,17 @@ using System.Text;
 
 namespace Raymarcher.Shaders
 {
+
+    public enum LightningType
+    {
+        Basic, Sun, None
+    }
+
     public class Basic : IShader
     {
         public static IShader shader = new Basic();
 
-        // Change for a lightshow
-        public static bool basicSun = true;
+        public LightningType lightning = LightningType.None;
 
         public Color Fragment(FragmentInput args)
         {
@@ -26,10 +31,14 @@ namespace Raymarcher.Shaders
         {
             Vector3 b = Vector3.Reflect(args.sphere.CalculateNormal(args.position), args.ray);
 
-            if(basicSun)
+            if (lightning == LightningType.Basic)
                 return SimpleSun(b) / MathF.PI;
-            else
+            else if (lightning == LightningType.Sun)
                 return Ray(args.position, args.ray, Program.sunStrength, args.sphere) / Program.sunStrength;
+            else if (lightning == LightningType.None)
+                return 1;
+
+            throw new Exception("No lightning alivalable for fragment shader!");
         }
 
         public static float Ray(Vector3 origin, Vector3 direction, float maxLen, Sphere sphere)
@@ -43,6 +52,7 @@ namespace Raymarcher.Shaders
                 for (int o = 0; o < Program.spheres.Count; o++)
                 {
                     float dst = Program.spheres[o].DistanceToSurface(pos);
+
                     if (dst <= Program.precision)
                     {
                         return maxLen;
@@ -54,7 +64,7 @@ namespace Raymarcher.Shaders
                 distanceTraveled += lowestDst;
             }
 
-            return distanceTraveled - 10;
+            return distanceTraveled;
         }
 
         public static Color MultC(Color a, Color b)
