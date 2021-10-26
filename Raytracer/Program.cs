@@ -37,7 +37,9 @@ namespace Raymarcher
             bool debugMenu = false;
 
             Raylib.SetTraceLogLevel(TraceLogLevel.LOG_NONE);
+            Raylib.SetConfigFlags(ConfigFlags.FLAG_WINDOW_RESIZABLE);
             Raylib.InitWindow(width, height, "Raymarcher");
+            
             Image image = Raylib.GenImageColor(width, height, Color.BLANK);
             
             Console.WriteLine("Started!");
@@ -91,6 +93,14 @@ namespace Raymarcher
                 if (Raylib.IsKeyPressed(KeyboardKey.KEY_E) && spheres.Count > 0)
                 {
                     spheres.RemoveAt(random.Next(spheres.Count));
+                }
+
+                if (Raylib.IsWindowResized())
+                {
+                    width = Raylib.GetScreenWidth();
+                    height = Raylib.GetScreenHeight();
+                    ratio = (float)height / width;
+                    image = Raylib.GenImageColor(width, height, Color.BLANK);
                 }
 
 
