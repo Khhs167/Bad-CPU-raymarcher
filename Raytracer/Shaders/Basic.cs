@@ -9,7 +9,7 @@ namespace Raymarcher.Shaders
 
     public enum LightningType
     {
-        Basic, Sun, None
+        Basic, Sun, None, ExperimentalMix
     }
 
     public class Basic : IShader
@@ -39,13 +39,20 @@ namespace Raymarcher.Shaders
             Vector3 b = Vector3.Reflect(args.ray, args.sphere.CalculateNormal(args.position));
 
             if (lightning == LightningType.Basic)
-                return SimpleSun(b) / MathF.PI;
+                return SimpleSun(b);
             else if (lightning == LightningType.Sun)
                 return SunRay(args.position, Program.sunStrength, args.sphere);
+            else if (lightning == LightningType.ExperimentalMix)
+                return Lerp(SimpleSun(b), SunRay(args.position, Program.sunStrength, args.sphere), 0f);
             else if (lightning == LightningType.None)
                 return 1;
 
             throw new Exception("No lightning alivalable for fragment shader!");
+        }
+
+        float Lerp(float firstFloat, float secondFloat, float by)
+        {
+            return firstFloat * (1 - by) + secondFloat * by;
         }
 
         public static float SunRay(Vector3 origin, float maxLen, Sphere sphere)
@@ -137,7 +144,8 @@ namespace Raymarcher.Shaders
 
         public static float SimpleSun(Vector3 n)
         {
-            return MathF.Acos(Vector3.Dot(n, Program.sun) / (n.Length() * Program.sun.Length()));
+            Vector3 direction = Vector3.Normalize(Program.sun);
+            return MathF.Acos(Vector3.Dot(n, direction)) / MathF.PI;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Raymarcher
 
         public static float average = 0f;
 
-        public static Vector3 sun = new Vector3(0, -10, 0);
+        public static Vector3 sun = new Vector3(-10, -10, -10);
 
         public static List<Sphere> spheres = new List<Sphere>
         {
