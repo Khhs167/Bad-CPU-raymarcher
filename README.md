@@ -1,4 +1,6 @@
-# Bad-CPU-raymarcher
+# Bad-CPU-raymarcher  
+[![.NET](https://github.com/Khhs167/Bad-CPU-raymarcher/actions/workflows/dotnet.yml/badge.svg)](https://github.com/Khhs167/Bad-CPU-raymarcher/actions/workflows/dotnet.yml)
+
 A Bad CPU raymarcher written in C#.
 
 It supports:
