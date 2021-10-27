@@ -9,14 +9,14 @@ namespace Raymarcher.Shaders
 
     public enum LightningType
     {
-        Basic, Sun, None, ExperimentalMix
+        Basic, SunRay, None, ExperimentalMix
     }
 
     public class Basic : IShader
     {
         public static IShader shader = new Basic();
 
-        public LightningType lightning = LightningType.Sun;
+        public LightningType lightning = LightningType.ExperimentalMix;
 
         public float roughness = 1f;
 
@@ -40,10 +40,10 @@ namespace Raymarcher.Shaders
 
             if (lightning == LightningType.Basic)
                 return SimpleSun(b);
-            else if (lightning == LightningType.Sun)
+            else if (lightning == LightningType.SunRay)
                 return SunRay(args.position, Program.sunStrength, args.sphere);
             else if (lightning == LightningType.ExperimentalMix)
-                return Lerp(SimpleSun(b), SunRay(args.position, Program.sunStrength, args.sphere), 0f);
+                return Lerp(SimpleSun(b), SunRay(args.position, Program.sunStrength, args.sphere), 1f);
             else if (lightning == LightningType.None)
                 return 1;
 
