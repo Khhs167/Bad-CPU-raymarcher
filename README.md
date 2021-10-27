@@ -8,7 +8,7 @@ It supports:
 * Reflections
 * Custom shaders
 
-Some(out of date) images:
+Some(out of date) images:  
 ![single sphere](https://github.com/Khhs167/Bad-CPU-raymarcher/raw/master/Raytracer/images/single.png)  
 ![multiple spheres + debug menu](https://github.com/Khhs167/Bad-CPU-raymarcher/raw/master/Raytracer/images/multi-debug.png)
 
