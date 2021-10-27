@@ -10,12 +10,20 @@ namespace Raymarcher
     {
         public static int width = 320, height = 180;
         public static float ratio = (float)height / width;
-        public static float nearPlane = 1f, farPlane = 10f;
 
+        public static float nearPlane = 1f, farPlane = 20f;
         public static float precision = 0.001f;
+        public static Vector3 cameraPosition;
+        public static float cameraRotation = 1.57079633f;
+
+        public static Vector3 cameraForward = Vector3.Zero;
+        public static Vector3 cameraRight = Vector3.Zero;
+        
         public static float sunStrength = 20f;
 
         public static float average = 0f;
+
+        static bool hasWarned = false;
 
         public static Vector3 sun = new Vector3(-10, -10, -10);
 
@@ -34,6 +42,10 @@ namespace Raymarcher
 
         static void Main(string[] args)
         {
+
+            cameraForward = new Vector3(MathF.Sin(cameraRotation), 0, MathF.Cos(cameraRotation));
+                    cameraRight = new Vector3(MathF.Sin(cameraRotation + 1.57079633f), 0, MathF.Cos(cameraRotation + 1.57079633f));
+
             Random random = new Random(DateTime.Now.Millisecond);
             bool debugMenu = false;
 
@@ -50,10 +62,20 @@ namespace Raymarcher
 
             while (!Raylib.WindowShouldClose())
             {
+
                 Raytrace(ref image, out long mspf, out long mspd);
                 //average += mspf;
                 //average *= 0.5f;
                 average = MathF.Max(average, 1000f / mspf);
+
+                if(!hasWarned && 1000f / (mspd + mspf) <= 3f){
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("Low performance! Is the resolution too high or can't the hardware keep up?");
+                    Console.ResetColor();
+                    hasWarned = true;
+                } else if(1000f / (mspd + mspf) > 3f){
+                    hasWarned = false;
+                }
 
                 Texture2D texture2D = Raylib.LoadTextureFromImage(image);
 
@@ -72,6 +94,8 @@ namespace Raymarcher
 
                     Raylib.DrawText("RESL: " + width + "x" + height, 5, height - 25, 10, Color.GREEN);
                     Raylib.DrawText("OBJC: " + spheres.Count, 5, height - 15, 10, Color.GREEN);
+
+                    Raylib.DrawText($"X: {cameraPosition.X}, Y: {cameraPosition.Y}, Z: {cameraPosition.Z}", 5, height - 35, 10, Color.GREEN);
                 }
 
                 Raylib.EndDrawing();
@@ -92,6 +116,23 @@ namespace Raymarcher
                         shader = Shaders.Basic.shader,
                         rnd = (float)random.NextDouble() * 100f
                     });
+                }
+                float dt = mspd + mspf;
+                if(Raylib.IsKeyDown(KeyboardKey.KEY_W)){
+                    cameraPosition += cameraForward * dt * 0.001f;
+                }
+                if(Raylib.IsKeyDown(KeyboardKey.KEY_S)){
+                    cameraPosition -= cameraForward * dt * 0.001f;
+                }
+                if(Raylib.IsKeyDown(KeyboardKey.KEY_D)){
+                    cameraRotation += dt * 0.001f;
+                    cameraForward = new Vector3(MathF.Sin(cameraRotation), 0, MathF.Cos(cameraRotation));
+                    cameraRight = new Vector3(MathF.Sin(cameraRotation + 1.57079633f), 0, MathF.Cos(cameraRotation + 1.57079633f));
+                }
+                if(Raylib.IsKeyDown(KeyboardKey.KEY_A)){
+                    cameraRotation -= dt * 0.001f;
+                    cameraForward = new Vector3(MathF.Sin(cameraRotation), 0, MathF.Cos(cameraRotation));
+                    cameraRight = new Vector3(MathF.Sin(cameraRotation + 1.57079633f), 0, MathF.Cos(cameraRotation + 1.57079633f));
                 }
 
                 if (Raylib.IsKeyPressed(KeyboardKey.KEY_E) && spheres.Count > 0)
@@ -154,9 +195,9 @@ namespace Raymarcher
             float distanceTraveled = 0;
 
             Vector2 screenCoord = new Vector2(u / (float)width / ratio, v / (float)height) - Vector2.One * 0.5f;
-            Vector3 worldCoord = new Vector3(nearPlane, screenCoord.Y, screenCoord.X);
+            Vector3 worldCoord = cameraForward * nearPlane + Vector3.UnitY * screenCoord.Y + screenCoord.X * cameraRight + cameraPosition;
 
-            Vector3 direction = worldCoord / worldCoord.Length();
+            Vector3 direction = Vector3.Normalize(worldCoord - cameraPosition);
 
             while(distanceTraveled <= farPlane)
             {
