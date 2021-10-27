@@ -16,9 +16,9 @@ namespace Raymarcher.Shaders
     {
         public static IShader shader = new Basic();
 
-        public LightningType lightning = LightningType.Basic;
+        public LightningType lightning = LightningType.Sun;
 
-        public float roughness = 0.1f;
+        public float roughness = 1f;
 
         public Color Fragment(FragmentInput args)
         {
@@ -36,7 +36,7 @@ namespace Raymarcher.Shaders
 
         public float CalculateLightning(FragmentInput args)
         {
-            Vector3 b = Vector3.Reflect(args.sphere.CalculateNormal(args.position), args.ray);
+            Vector3 b = Vector3.Reflect(args.ray, args.sphere.CalculateNormal(args.position));
 
             if (lightning == LightningType.Basic)
                 return SimpleSun(b) / MathF.PI;
@@ -54,8 +54,11 @@ namespace Raymarcher.Shaders
 
             Vector3 direction = Vector3.Normalize(Program.sun);
 
-            //origin += sphere.CalculateNormal(origin) * Program.precision;
+           
+            origin -= sphere.CalculateNormal(origin) * Program.precision * 2;
+
             while (distanceTraveled <= maxLen)
+
             {
                 Vector3 pos = origin + (direction * distanceTraveled);
                 float lowestDst = float.MaxValue;
@@ -63,6 +66,9 @@ namespace Raymarcher.Shaders
                 for (int o = 0; o < Program.spheres.Count; o++)
                 {
                     float dst = Program.spheres[o].DistanceToSurface(pos);
+
+                    //if (Program.spheres[o] == sphere)
+                    //    continue;
 
                     if (dst <= Program.precision)
                     {
@@ -82,7 +88,7 @@ namespace Raymarcher.Shaders
         {
             float distanceTraveled = 0;
 
-            Vector3 direction = Vector3.Reflect(args.sphere.CalculateNormal(args.position), args.ray);
+            Vector3 direction = Vector3.Reflect(args.ray, args.sphere.CalculateNormal(args.position));
 
             //origin += sphere.CalculateNormal(origin) * Program.precision;
             while (distanceTraveled <= Program.farPlane)

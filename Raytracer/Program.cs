@@ -17,7 +17,7 @@ namespace Raymarcher
 
         public static float average = 0f;
 
-        public static Vector3 sun = new Vector3(-1, -1, 0);
+        public static Vector3 sun = new Vector3(0, -10, 0);
 
         public static List<Sphere> spheres = new List<Sphere>
         {
@@ -25,7 +25,7 @@ namespace Raymarcher
             {
                 posistion = new Vector3(11.5f, 0f, 0.5f),
                 color = Color.RED,
-                radius = 1f,
+                radius = 0.5f,
                 shader = Shaders.Basic.shader,
                 rnd = 0f
             }
@@ -44,6 +44,9 @@ namespace Raymarcher
             Image image = Raylib.GenImageColor(width, height, Color.BLANK);
             
             Console.WriteLine("Started!");
+            Shaders.Basic shader = new Shaders.Basic();
+            shader.roughness = 1f;
+            spheres[0].shader = shader;
 
             while (!Raylib.WindowShouldClose())
             {
