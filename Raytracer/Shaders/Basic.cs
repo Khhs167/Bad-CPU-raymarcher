@@ -55,7 +55,7 @@ namespace Raymarcher.Shaders
             Vector3 direction = Vector3.Normalize(Program.sun);
 
            
-            origin -= sphere.CalculateNormal(origin) * Program.precision * 2;
+            origin -= sphere.CalculateNormal(origin) * (Program.precision + float.Epsilon);
 
             while (distanceTraveled <= maxLen)
 
