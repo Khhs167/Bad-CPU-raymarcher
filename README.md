@@ -1,7 +1,17 @@
-# Bad-CPU-raymarcher
-A Bad CPU raymarcher written in C#
+# Bad-CPU-raymarcher  
+[![.NET](https://github.com/Khhs167/Bad-CPU-raymarcher/actions/workflows/dotnet.yml/badge.svg)](https://github.com/Khhs167/Bad-CPU-raymarcher/actions/workflows/dotnet.yml)
 
-![single sphere](https://github.com/Khhs167/Bad-CPU-raymarcher/raw/master/Raytracer/images/single.png)
+A Bad CPU raymarcher written in C#.
+
+It supports:
+* Spheres
+* Moving camera
+* Shadows
+* Reflections
+* Custom shaders
+
+Some(out of date) images:  
+![single sphere](https://github.com/Khhs167/Bad-CPU-raymarcher/raw/master/Raytracer/images/single.png)  
 ![multiple spheres + debug menu](https://github.com/Khhs167/Bad-CPU-raymarcher/raw/master/Raytracer/images/multi-debug.png)
 
 ## Contributing

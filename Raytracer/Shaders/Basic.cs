@@ -18,7 +18,7 @@ namespace Raymarcher.Shaders
 
         public LightningType lightning = LightningType.SunRay;
 
-        public float roughness = 1f;
+        public float roughness = 1;
 
         public Color Fragment(FragmentInput args)
         {
