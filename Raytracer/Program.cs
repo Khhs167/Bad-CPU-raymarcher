@@ -11,7 +11,7 @@ namespace Raymarcher
         public static int width = 320, height = 180;
         public static float ratio = (float)height / width;
 
-        public static float nearPlane = 1f, farPlane = 20f;
+        public static float nearPlane = 1f, farPlane = 10f;
         public static float precision = 0.001f;
         public static Vector3 cameraPosition;
         public static float cameraRotation = 1.57079633f;
@@ -110,11 +110,15 @@ namespace Raymarcher
 
                 if (Raylib.IsKeyPressed(KeyboardKey.KEY_Q))
                 {
+
+                    float size = (float)random.NextDouble() * 0.5f;
+
                     spheres.Add(new Sphere
                     {
-                        posistion = new Vector3(0f, (float)random.NextDouble() * 2 - 0.5f, (float)random.NextDouble() * 2),
+                        //posistion = new Vector3(0f, (float)random.NextDouble() * 2 - 0.5f, (float)random.NextDouble() * 2),
+                        posistion = cameraPosition + (cameraForward * (nearPlane + 1f)),
                         color = new Color(random.Next(256), random.Next(256),random.Next(256), 255),
-                        radius = (float)random.NextDouble() * 0.5f,
+                        radius = size,
                         shader = Shaders.Basic.shader,
                         rnd = (float)random.NextDouble() * 100f
                     });
@@ -153,7 +157,7 @@ namespace Raymarcher
 
                 foreach (var sphere in spheres)
                 {
-                    sphere.posistion.X = MathF.Sin((float)Raylib.GetTime() + sphere.rnd) + 3f;
+                    //sphere.posistion.X = MathF.Sin((float)Raylib.GetTime() + sphere.rnd) + 3f;
                 }
                 
             }
@@ -167,7 +171,8 @@ namespace Raymarcher
             visibleSpheres.Clear();
             foreach (var sphere in spheres)
             {
-                if(sphere.DistanceToSurface())
+                if (sphere.DistanceToSurface(cameraPosition + cameraForward * nearPlane) <= farPlane)
+                    visibleSpheres.Add(sphere);
             }
 
 
@@ -203,7 +208,7 @@ namespace Raymarcher
             
             float distanceTraveled = 0;
 
-            Vector2 screenCoord = new Vector2(u / (float)width / ratio, v / (float)height) - Vector2.One * 0.5f;
+            Vector2 screenCoord = new Vector2(u / ((float)width * ratio), v / (float)height) - new Vector2(0.5f / ratio, 0.5f);
             Vector3 worldCoord = cameraForward * nearPlane + Vector3.UnitY * screenCoord.Y + screenCoord.X * cameraRight + cameraPosition;
 
             Vector3 direction = Vector3.Normalize(worldCoord - cameraPosition);
@@ -213,12 +218,12 @@ namespace Raymarcher
                 Vector3 pos = worldCoord + (direction * distanceTraveled);
                 float lowestDst = float.MaxValue;
 
-                for (int o = 0; o < spheres.Count; o++)
+                for (int o = 0; o < visibleSpheres.Count; o++)
                 {
-                    float dst = spheres[o].DistanceToSurface(pos);
+                    float dst = visibleSpheres[o].DistanceToSurface(pos);
                     if (dst <= precision)
                     {
-                        return spheres[o].shader.Fragment(new FragmentInput { position = pos, ray = direction, sphere = spheres[o], layer = 0 });
+                        return visibleSpheres[o].shader.Fragment(new FragmentInput { position = pos, ray = direction, sphere = visibleSpheres[o], layer = 0 });
                     }
 
                     lowestDst = MathF.Min(lowestDst, dst);
