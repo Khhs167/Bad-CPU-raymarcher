@@ -32,6 +32,8 @@ namespace Raymarcher
             
         };
 
+        public static List<Sphere> visibleSpheres = new List<Sphere>();
+
         static void Main(string[] args)
         {
             Random random = new Random(DateTime.Now.Millisecond);
@@ -120,6 +122,13 @@ namespace Raymarcher
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
+
+            visibleSpheres.Clear();
+            foreach (var sphere in spheres)
+            {
+                if(sphere.DistanceToSurface())
+            }
+
 
             var screen = new Color[width, height];
 

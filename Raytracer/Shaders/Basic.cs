@@ -16,7 +16,7 @@ namespace Raymarcher.Shaders
     {
         public static IShader shader = new Basic();
 
-        public LightningType lightning = LightningType.ExperimentalMix;
+        public LightningType lightning = LightningType.SunRay;
 
         public float roughness = 1f;
 
