@@ -11,7 +11,7 @@ namespace Raymarcher
         public static int width = 320, height = 180;
         public static float ratio = (float)height / width;
 
-        public static float nearPlane = 1f, farPlane = 10f;
+        public static float nearPlane = 0.5f, farPlane = 10f;
         public static float precision = 0.001f;
         public static Vector3 cameraPosition;
         public static float cameraRotation = 1.57079633f;
@@ -26,6 +26,8 @@ namespace Raymarcher
         static bool hasWarned = false;
 
         public static Vector3 sun = new Vector3(-10, -10, -10);
+
+        static Vector2 preMouse;
 
         public static List<Sphere> spheres = new List<Sphere>
         {
@@ -51,16 +53,21 @@ namespace Raymarcher
             Random random = new Random(DateTime.Now.Millisecond);
             bool debugMenu = false;
 
+            
             Raylib.SetTraceLogLevel(TraceLogLevel.LOG_NONE);
             Raylib.SetConfigFlags(ConfigFlags.FLAG_WINDOW_RESIZABLE);
             Raylib.InitWindow(width, height, "Raymarcher");
-            
+            Raylib.DisableCursor();
+
+
             Image image = Raylib.GenImageColor(width, height, Color.BLANK);
             
             Console.WriteLine("Started!");
             Shaders.Basic shader = new Shaders.Basic();
             shader.roughness = 1f;
             spheres[0].shader = shader;
+
+            preMouse = Raylib.GetMousePosition() / new Vector2(width, height);
 
             while (!Raylib.WindowShouldClose())
             {
@@ -97,6 +104,7 @@ namespace Raymarcher
                     Raylib.DrawText("RESL: " + width + "x" + height, 5, height - 25, 10, Color.GREEN);
                     Raylib.DrawText("OBJC: " + spheres.Count, 5, height - 15, 10, Color.GREEN);
 
+                    Raylib.DrawText($"CROT: " + cameraRotation, 5, height - 45, 10, Color.GREEN);
                     Raylib.DrawText($"X: {cameraPosition.X}, Y: {cameraPosition.Y}, Z: {cameraPosition.Z}", 5, height - 35, 10, Color.GREEN);
                 }
 
@@ -123,23 +131,36 @@ namespace Raymarcher
                         rnd = (float)random.NextDouble() * 100f
                     });
                 }
+
+                float speedBoost = Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_SHIFT) ? 5f : 1f;
+
                 float dt = mspd + mspf;
                 if(Raylib.IsKeyDown(KeyboardKey.KEY_W)){
-                    cameraPosition += cameraForward * dt * 0.001f;
+                    cameraPosition += cameraForward * dt * 0.001f * speedBoost;
                 }
                 if(Raylib.IsKeyDown(KeyboardKey.KEY_S)){
-                    cameraPosition -= cameraForward * dt * 0.001f;
+                    cameraPosition -= cameraForward * dt * 0.001f * speedBoost;
                 }
                 if(Raylib.IsKeyDown(KeyboardKey.KEY_D)){
-                    cameraRotation += dt * 0.001f;
-                    cameraForward = new Vector3(MathF.Sin(cameraRotation), 0, MathF.Cos(cameraRotation));
-                    cameraRight = new Vector3(MathF.Sin(cameraRotation + 1.57079633f), 0, MathF.Cos(cameraRotation + 1.57079633f));
+                    cameraPosition += cameraRight * dt * 0.001f * speedBoost;
                 }
                 if(Raylib.IsKeyDown(KeyboardKey.KEY_A)){
-                    cameraRotation -= dt * 0.001f;
-                    cameraForward = new Vector3(MathF.Sin(cameraRotation), 0, MathF.Cos(cameraRotation));
-                    cameraRight = new Vector3(MathF.Sin(cameraRotation + 1.57079633f), 0, MathF.Cos(cameraRotation + 1.57079633f));
+                    cameraPosition -= cameraRight * dt * 0.001f * speedBoost;
                 }
+                if (Raylib.IsKeyDown(KeyboardKey.KEY_SPACE))
+                {
+                    cameraPosition -= Vector3.UnitY * dt * 0.001f * speedBoost;
+                }
+                if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL))
+                {
+                    cameraPosition += Vector3.UnitY * dt * 0.001f * speedBoost;
+                }
+
+                cameraRotation += ((Raylib.GetMouseX() / (float)width) - preMouse.X);
+                preMouse = Raylib.GetMousePosition() / new Vector2(width, height);
+
+                cameraForward = new Vector3(MathF.Sin(cameraRotation), 0, MathF.Cos(cameraRotation));
+                cameraRight = new Vector3(MathF.Sin(cameraRotation + 1.57079633f), 0, MathF.Cos(cameraRotation + 1.57079633f));
 
                 if (Raylib.IsKeyPressed(KeyboardKey.KEY_E) && spheres.Count > 0)
                 {
